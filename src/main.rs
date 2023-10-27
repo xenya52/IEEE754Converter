@@ -1,6 +1,8 @@
 use std::io;
 
+//From decimal to IEEE754
 fn one_serialize() {
+    //Take userInput as a string
     println!("<=Serialize=>");
     println!("Type number in");
     let mut userInput =  String::new();
@@ -8,10 +10,53 @@ fn one_serialize() {
         .read_line(&mut userInput)
         .expect("Fail to read from stdin");
     
+    //dereverence the string
     let numericInput = userInput.trim();
-    match numericInput.parse::<u32>() {
-        Ok(i) => println!("your integer input: {}", i),
-        Err(..) => println!("this was not an integer: {}", numericInput),
+    match numericInput.parse::<f32>() {
+        Ok(givenFloat) => {
+            let mut result:u32 = 0;
+            let mut num = givenFloat;
+        
+            // Bit set for the leader
+            if num < 0.0 {
+                result |= 0x80000000; // Set the sign bit (Bit 31) for negative numbers
+                num = -num; // Make the number positive for further processing
+            }
+        
+            let mut exponent = 127;
+        
+            // Normalize the decimal number
+            while num >= 2.0 {
+                num /= 2.0;
+                exponent += 1;
+            }
+            while num < 1.0 && exponent > 0 {
+                num *= 2.0;
+                exponent -= 1;
+            }
+        
+            // remove the implicit one leader (Bias: 127)
+            let mut fraction = num - 1.0;
+            let mut frac_bits = 0;
+        
+            // Calculate the mantisse (Bits 0-22)
+            for i in 0..23 {
+                fraction *= 2.0;
+                if fraction >= 1.0 {
+                    frac_bits |= 1 << (22 - i);
+                    fraction -= 1.0;
+                }
+            }
+        
+            // Set the Exponent (Bits 23-30)
+            exponent &= 0xFF; // Bond the exponent on 8 Bits
+            exponent <<= 23;
+        
+            result |= exponent | frac_bits;
+        
+            println!("You result {}", result);
+        }
+        Err(..) => println!("Not a number: {}", numericInput),
     };
 }
 
@@ -25,8 +70,11 @@ fn two_deserialize() {
     
     let numericInput = userInput.trim();
     match numericInput.parse::<u32>() {
-        Ok(i) => println!("your integer input: {}", i),
-        Err(..) => println!("this was not an integer: {}", numericInput),
+        Ok(i) => {
+            println!("You input: {}", i);
+            println!("After the division: {}", i + i);
+        }
+        Err(..) => println!("Not a number: {}", numericInput),
     };
 }
 
@@ -37,6 +85,7 @@ It defines the representation of real numbers by sign, exponent and mantissa.");
 
 fn mainMenu() {
     loop {
+        println!("<- Menu ->");
         let mut choice = String::new();
         io::stdin().read_line(&mut choice).expect("Fehler beim Einlesen");
         let choice: u32 = match choice.trim().parse() {
@@ -69,6 +118,7 @@ fn mainMenu() {
 }
 
 fn four_help() {
+    print!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     println!("<=IEEE.754 Converter=>");
     println!("<=Choose a operation=>");
     println!("<-------------------->");
