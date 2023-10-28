@@ -14,6 +14,29 @@ fn one_serialize() {
     let numericInput = userInput.trim();
     match numericInput.parse::<f32>() {
         Ok(givenFloat) => {
+            let mut positiveInput: u32 = givenFloat as u32;
+            let mut tempArray = [0;32];
+            let mut index:usize = 31;
+            loop {
+                //If the calculation is over
+                if positiveInput <= 0 {
+                    break;
+                }
+                //We had a residual
+                else if positiveInput % 2 != 0 {
+                    tempArray[index] = 1;
+                }
+                //We dont have a residual
+                else {
+                    tempArray[index] = 0;
+                }
+                //Jump to the next calculation step
+                index -= 1;
+                positiveInput = positiveInput / 2;
+            }
+            //"Testing" give array out
+            println!("{:?}", tempArray);
+            /*
             let mut result:u32 = 0;
             let mut num = givenFloat;
         
@@ -53,8 +76,9 @@ fn one_serialize() {
             exponent <<= 23;
         
             result |= exponent | frac_bits;
-        
+            
             println!("You result {}", result);
+            */
         }
         Err(..) => println!("Not a number: {}", numericInput),
     };
