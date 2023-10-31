@@ -15,6 +15,7 @@ fn one_serialize() {
     match numericInput.parse::<f32>() {
         Ok(givenFloat) => {
             let mut positiveInput: u32 = givenFloat as u32;
+            let mut negativeInput: f32 =(givenFloat as f32 - positiveInput as f32) as f32;
             let mut tempArray = [0;32];
             let mut index:usize = 31;
             loop {
@@ -34,6 +35,23 @@ fn one_serialize() {
                 index -= 1;
                 positiveInput = positiveInput / 2;
             }
+            //Separate the decimal part from the full part
+            tempArray[index] = 2;
+            index -= 1;
+            loop {
+                if negativeInput == 1 as f32 {
+                    break;
+                }
+                else if negativeInput * 2 as f32 >= 1 as f32 {
+                    tempArray[index] = 1;
+                }
+                else {
+                    tempArray[index] = 0;
+                }
+                index -= 1;
+                negativeInput = negativeInput * 2 as f32;
+            }
+            
             //"Testing" give array out
             println!("{:?}", tempArray);
             /*
