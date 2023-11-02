@@ -18,6 +18,7 @@ fn one_serialize() {
             let mut negativeInput: f32 =(givenFloat as f32 - positiveInput as f32) as f32;
             let mut tempArray = [0;32];
             let mut index:usize = 31;
+            let mut tempNameStellenzähler: u8 = 0;
             loop {
                 //If the calculation is over
                 if positiveInput <= 0 {
@@ -33,8 +34,10 @@ fn one_serialize() {
                 }
                 //Jump to the next calculation step
                 index -= 1;
+                tempNameStellenzähler += 1;
                 positiveInput = positiveInput / 2;
             }
+            tempNameStellenzähler -= 1;
             //Separate the decimal part from the full part
             tempArray[index] = 2;
             index -= 1;
@@ -54,49 +57,6 @@ fn one_serialize() {
             
             //"Testing" give array out
             println!("{:?}", tempArray);
-            /*
-            let mut result:u32 = 0;
-            let mut num = givenFloat;
-        
-            // Bit set for the leader
-            if num < 0.0 {
-                result |= 0x80000000; // Set the sign bit (Bit 31) for negative numbers
-                num = -num; // Make the number positive for further processing
-            }
-        
-            let mut exponent = 127;
-        
-            // Normalize the decimal number
-            while num >= 2.0 {
-                num /= 2.0;
-                exponent += 1;
-            }
-            while num < 1.0 && exponent > 0 {
-                num *= 2.0;
-                exponent -= 1;
-            }
-        
-            // remove the implicit one leader (Bias: 127)
-            let mut fraction = num - 1.0;
-            let mut frac_bits = 0;
-        
-            // Calculate the mantisse (Bits 0-22)
-            for i in 0..23 {
-                fraction *= 2.0;
-                if fraction >= 1.0 {
-                    frac_bits |= 1 << (22 - i);
-                    fraction -= 1.0;
-                }
-            }
-        
-            // Set the Exponent (Bits 23-30)
-            exponent &= 0xFF; // Bond the exponent on 8 Bits
-            exponent <<= 23;
-        
-            result |= exponent | frac_bits;
-            
-            println!("You result {}", result);
-            */
         }
         Err(..) => println!("Not a number: {}", numericInput),
     };
