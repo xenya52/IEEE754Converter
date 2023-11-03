@@ -13,12 +13,67 @@ fn one_serialize() {
     //dereverence the string
     let numericInput = userInput.trim();
     match numericInput.parse::<f32>() {
-        Ok(givenFloat) => {
+        Ok(decimal) => {
+            let mut pre_decimal_place: i32 = decimal as i32;
+            let mut decimal_place: f32 = decimal - pre_decimal_place as f32;
+            let mut ieeeArray = [0;32]; //mantissa included
+            let mut temp: u8 = 0; //get used for expoent and characteristic
+            let mut i: usize = 0;
+
+            //negative or positive?
+            if pre_decimal_place < 0 {
+                ieeeArray[i] = 1;
+            }
+            i += 9;
+            //conversion of the pre decimal place
+            pre_decimal_place = pre_decimal_place / 2; //Ignore the first mantissa index
+            while pre_decimal_place != 0 {
+                if pre_decimal_place % 2 != 0 { // We have a residual
+                    ieeeArray[i] = 1;
+                }
+                else { // We dont have a residual
+                    ieeeArray[i] = 0;
+                }
+                pre_decimal_place = pre_decimal_place / 2;
+                i += 1;
+                temp += 1;
+            }
+            i += 1;
+            //conversion of the decimal place
+            while decimal_place == 1.0 {
+                if decimal_place * 2.0 > 1.0 {
+                    ieeeArray[i] = 1;
+                }
+                else {
+                    ieeeArray[i] = 0;
+                }
+                decimal_place = decimal_place * 2.0;
+                i += 1;
+            }
+            i += 1;
+            ieeeArray[i] = 1;
+
+            //characteristic
+            i = i * 1 - i;
+            temp = temp + 127;
+            while temp != 0 {
+                if temp % 2 != 0 { // We have a residual
+                    ieeeArray[i] = 1;
+                }
+                else { // We dont have a residual
+                    ieeeArray[i] = 0;
+                }
+                temp = temp / 2;
+                i += 1;
+            }
+            
+            println!("{:?}", ieeeArray);
+            /*
             let mut positiveInput: u32 = givenFloat as u32;
             let mut negativeInput: f32 =(givenFloat as f32 - positiveInput as f32) as f32;
             let mut tempArray = [0;32];
             let mut index:usize = 31;
-            let mut tempNameStellenzähler: u8 = 0;
+            let mut exponent: u8 = 0;
             loop {
                 //If the calculation is over
                 if positiveInput <= 0 {
@@ -34,12 +89,16 @@ fn one_serialize() {
                 }
                 //Jump to the next calculation step
                 index -= 1;
-                tempNameStellenzähler += 1;
+                exponent += 1;
                 positiveInput = positiveInput / 2;
+                if (index == 30) {
+                    tempArray[index] = 2;
+                    index -= 1;
+                }
             }
-            tempNameStellenzähler -= 1;
+            exponent -= 1;
+            //Define Mantissa
             //Separate the decimal part from the full part
-            tempArray[index] = 2;
             index -= 1;
             loop {
                 if negativeInput == 1 as f32 {
@@ -57,6 +116,8 @@ fn one_serialize() {
             
             //"Testing" give array out
             println!("{:?}", tempArray);
+            */
+
         }
         Err(..) => println!("Not a number: {}", numericInput),
     };
