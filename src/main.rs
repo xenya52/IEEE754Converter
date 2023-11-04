@@ -1,152 +1,113 @@
+use core::num;
 use std::io;
 
-//From decimal to IEEE754
+/*
+From decimal to IEEE754
+*/
 fn one_serialize() {
     //Take userInput as a string
     println!("<=Serialize=>");
     println!("Type number in");
-    let mut userInput =  String::new();
+    let mut user_input =  String::new();
     io::stdin()
-        .read_line(&mut userInput)
+        .read_line(&mut user_input)
         .expect("Fail to read from stdin");
     
     //dereverence the string
-    let numericInput = userInput.trim();
-    match numericInput.parse::<f32>() {
+    let numeric_input = user_input.trim();
+    match numeric_input.parse::<f32>() {
         Ok(decimal) => {
             let mut pre_decimal_place: i32 = decimal as i32;
             let mut decimal_place: f32 = decimal - pre_decimal_place as f32;
-            let mut ieeeArray = [0;32]; //mantissa included
+            let mut ieee_array = [0;32]; //mantissa included
             let mut temp: u8 = 0; //get used for expoent and characteristic
             let mut i: usize = 0;
 
             //negative or positive?
             if pre_decimal_place < 0 {
-                ieeeArray[i] = 1;
+                ieee_array[i] = 1;
             }
             i += 9;
             //conversion of the pre decimal place
-            pre_decimal_place = pre_decimal_place / 2; //Ignore the first mantissa index
-            while pre_decimal_place != 0 {
-                if pre_decimal_place % 2 != 0 { // We have a residual
-                    ieeeArray[i] = 1;
+            if (pre_decimal_place != 0) {
+                pre_decimal_place = pre_decimal_place / 2; //Ignore the first mantissa index
+                while pre_decimal_place != 0 {
+                    if pre_decimal_place % 2 != 0 { // We have a residual
+                        ieee_array[i] = 1;
+                    }
+                    else { // We dont have a residual
+                        ieee_array[i] = 0;
+                    }
+                    pre_decimal_place = pre_decimal_place / 2;
+                    i += 1;
+                    temp += 1;
                 }
-                else { // We dont have a residual
-                    ieeeArray[i] = 0;
-                }
-                pre_decimal_place = pre_decimal_place / 2;
-                i += 1;
-                temp += 1;
             }
-            i += 1;
-            //conversion of the decimal place
-            while decimal_place == 1.0 {
-                if decimal_place * 2.0 > 1.0 {
-                    ieeeArray[i] = 1;
+            if decimal_place != 0.0 {
+                //conversion of the decimal place
+                let mut loop_check: bool = true;
+                while loop_check {
+                    decimal_place = decimal_place * 2.0;
+                    if decimal_place == 1.0 {
+                        loop_check = false;
+                    }
+                    if decimal_place * 2.0 > 1.0 {
+                        ieee_array[i] = 1;
+                    }
+                    else {
+                        ieee_array[i] = 0;
+                    }
+                    i += 1;
                 }
-                else {
-                    ieeeArray[i] = 0;
-                }
-                decimal_place = decimal_place * 2.0;
-                i += 1;
             }
-            i += 1;
-            ieeeArray[i] = 1;
-
             //characteristic
-            i = i * 1 - i;
-            temp = temp + 127;
-            while temp != 0 {
-                if temp % 2 != 0 { // We have a residual
-                    ieeeArray[i] = 1;
+            i = 8;
+            if numeric_input != "0" {
+                temp = temp + 127;
+                while temp != 0 {
+                    if temp % 2 != 0 { // We have a residual
+                        ieee_array[i] = 1;
+                    }
+                    else { // We dont have a residual
+                        ieee_array[i] = 0;
+                    }
+                    temp = temp / 2;
+                    i -= 1;
                 }
-                else { // We dont have a residual
-                    ieeeArray[i] = 0;
-                }
-                temp = temp / 2;
-                i += 1;
             }
             
-            println!("{:?}", ieeeArray);
-            /*
-            let mut positiveInput: u32 = givenFloat as u32;
-            let mut negativeInput: f32 =(givenFloat as f32 - positiveInput as f32) as f32;
-            let mut tempArray = [0;32];
-            let mut index:usize = 31;
-            let mut exponent: u8 = 0;
-            loop {
-                //If the calculation is over
-                if positiveInput <= 0 {
-                    break;
-                }
-                //We had a residual
-                else if positiveInput % 2 != 0 {
-                    tempArray[index] = 1;
-                }
-                //We dont have a residual
-                else {
-                    tempArray[index] = 0;
-                }
-                //Jump to the next calculation step
-                index -= 1;
-                exponent += 1;
-                positiveInput = positiveInput / 2;
-                if (index == 30) {
-                    tempArray[index] = 2;
-                    index -= 1;
-                }
-            }
-            exponent -= 1;
-            //Define Mantissa
-            //Separate the decimal part from the full part
-            index -= 1;
-            loop {
-                if negativeInput == 1 as f32 {
-                    break;
-                }
-                else if negativeInput * 2 as f32 >= 1 as f32 {
-                    tempArray[index] = 1;
-                }
-                else {
-                    tempArray[index] = 0;
-                }
-                index -= 1;
-                negativeInput = negativeInput * 2 as f32;
-            }
             
-            //"Testing" give array out
-            println!("{:?}", tempArray);
-            */
-
+            println!("{:?}", ieee_array);
         }
-        Err(..) => println!("Not a number: {}", numericInput),
+        Err(..) => println!("Not a number: {}", numeric_input),
     };
 }
 
 fn two_deserialize() {
     println!("<=Deserialize=>");
     println!("Type number in");
-    let mut userInput =  String::new();
+    let mut user_input =  String::new();
+    let mut i = 0; //index
     io::stdin()
-        .read_line(&mut userInput)
+        .read_line(&mut user_input)
         .expect("Fail to read from stdin");
     
-    let numericInput = userInput.trim();
-    match numericInput.parse::<u32>() {
-        Ok(i) => {
-            println!("You input: {}", i);
-            println!("After the division: {}", i + i);
-        }
-        Err(..) => println!("Not a number: {}", numericInput),
-    };
-}
+    let mut binary_array: [u8;32] = [0;32];
 
+    for c in user_input.chars() {
+        if c == '1' {
+            binary_array[i] = 1;
+        }
+        i += 1;
+    }
+    println!("{:?}", binary_array);
+}
 fn three_explanation() {
     println!("The IEEE 754 is a standard for representing floating-point numbers (floating-point numbers) in the binary system in computers.
 It defines the representation of real numbers by sign, exponent and mantissa.");
 }
 
-fn mainMenu() {
+fn main_menu() {
     loop {
         println!("<- Menu ->");
         let mut choice = String::new();
@@ -194,5 +155,5 @@ fn four_help() {
 }
 fn main() {
         four_help();
-        mainMenu();
+        main_menu();
 }
