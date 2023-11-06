@@ -88,6 +88,9 @@ fn two_deserialize() {
     println!("Type number in");
     let mut user_input =  String::new();
     let mut i = 0; //index
+    let mut counter:usize = 0; //calculation index
+    let mut exponent: u8 = 0;
+    let base: u8 = 2;
     io::stdin()
         .read_line(&mut user_input)
         .expect("Fail to read from stdin");
@@ -100,6 +103,15 @@ fn two_deserialize() {
         }
         i += 1;
     }
+    //Calculate the characteristic
+    i = 8;
+    while i != 0 {
+        exponent += binary_array[i] * base.pow(counter as u32);
+        counter += 1;
+        i -= 1;
+    }
+    exponent -= 127;
+    println!("{}", exponent);
     println!("{:?}", binary_array);
 }
 fn three_explanation() {
