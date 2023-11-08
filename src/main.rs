@@ -1,5 +1,5 @@
 use core::num;
-use std::io;
+use std::{io, array};
 
 /*
 From decimal to IEEE754
@@ -87,10 +87,11 @@ fn two_deserialize() {
     println!("<=Deserialize=>");
     println!("Type number in");
     let mut user_input =  String::new();
-    let mut i = 0; //index
+    let mut i:usize = 0; //index
     let mut counter:usize = 0; //calculation index
     let mut exponent: u8 = 0;
     let base: u8 = 2;
+    let mut solution:f32 = 0.0;
     io::stdin()
         .read_line(&mut user_input)
         .expect("Fail to read from stdin");
@@ -111,6 +112,26 @@ fn two_deserialize() {
         i -= 1;
     }
     exponent -= 127;
+    //Calculate the pre decimal place
+    i = exponent as usize + 8;
+    counter = 0;
+    while i != 8 {
+        solution += binary_array[i] as f32 * base.pow(counter as u32) as f32;
+        i -= 1;
+        counter += 1;
+    }
+    solution += 1.0 * base.pow(counter as u32) as f32;
+    //Calculate the decimal place
+    i = 31;
+    counter = 0;
+    while i != exponent as usize + 8 {
+        solution += binary_array[i] as f32 * base.pow(counter as u32) as f32;
+        i -= 1;
+        counter += 1;
+    }
+
+
+    println!("{}", solution);
     println!("{}", exponent);
     println!("{:?}", binary_array);
 }
