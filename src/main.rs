@@ -1,5 +1,4 @@
-use core::num;
-use std::{io, array};
+use std::{io, env};
 
 /*
 From decimal to IEEE754
@@ -18,7 +17,7 @@ fn one_serialize(decimal: f32) {
     }
     i += 9;
     //conversion of the pre decimal place
-    if (pre_decimal_place != 0) {
+    if pre_decimal_place != 0 {
         pre_decimal_place = pre_decimal_place / 2; //Ignore the first mantissa index
         while pre_decimal_place != 0 {
             if pre_decimal_place % 2 != 0 { // We have a residual
@@ -73,25 +72,22 @@ fn ieee754_to_decimal(binary: u32) -> f32 {
     float_value
 }
 
-fn three_explanation() {
-    println!("The IEEE 754 is a standard for representing floating-point numbers (floating-point numbers) in the binary system in computers.
-It defines the representation of real numbers by sign, exponent and mantissa.");
-}
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    let param1 = &args[1];
+    let param2 = &args[2];
 
-fn main_menu() {
     loop {
-        println!("<- Menu ->");
-        let mut choice = String::new();
-        io::stdin().read_line(&mut choice).expect("Fehler beim Einlesen");
-        let choice: u32 = match choice.trim().parse() {
+        let number_input: u32 = match param2.trim().parse() {
             Ok(num) => num,
             Err(_) => {
-                println!("Ungültige Eingabe. Bitte wähle eine der verfügbaren Optionen.");
+                println!("Invalid input in loop");
                 continue;
             }
         };
-        match choice {
-            1 => {
+        let option:Vec<_> = param1.chars().collect();
+        match option[0] {
+            's' => {
                 println!("Type you float number");
                 //Take userInput as a string
                 println!("<=Serialize=>");
@@ -109,9 +105,9 @@ fn main_menu() {
                     }
                 };
                 one_serialize(number);
+                break;
             }
-            2 => {
-                
+            'd' => {
                 //Take userInput as a string
                 println!("<=Deserialize=>");
                 println!("Type you IEEE754 standartisted number");
@@ -119,35 +115,9 @@ fn main_menu() {
                 let decimal_value = ieee754_to_decimal(binary_value);
                 println!("IEEE 754 Binär: {:032b}", binary_value);
                 println!("Dezimal: {}", decimal_value);
-            }   
-            3 => {
-                println!("<=Explanation=>");
-                three_explanation();
-            }
-            4 => {
-                four_help();
-            }
-            5 => {
                 break;
             }
-            _ => println!("Wrong input!")
+            _ => println!("Type: [execution] -s (serialize) || -d (desirialised) [value]")
         }
     }
-}
-
-fn four_help() {
-    print!("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    println!("<=IEEE.754 Converter=>");
-    println!("<=Choose a operation=>");
-    println!("<-------------------->");
-    println!("<-1.Serialize to 754->");
-    println!("<-2.Deserialize     ->");
-    println!("<-3.Explanation     ->");
-    println!("<-4.Help            ->");
-    println!("<-5.Quit            ->");
-    println!("<-------------------->");
-}
-fn main() {
-        four_help();
-        main_menu();
 }
