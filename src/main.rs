@@ -3,11 +3,11 @@ use std::{io, env};
 /*
 From decimal to IEEE754
 */
-fn one_serialize(decimal: f32) {
+fn decimal_to_ieee754(decimal: f32) -> [u32;32] {
     let numeric_input = decimal;
     let mut pre_decimal_place: i32 = decimal as i32;
     let mut decimal_place: f32 = decimal - pre_decimal_place as f32;
-    let mut ieee_array = [0;32]; //mantissa included
+    let mut ieee_array:[u32;32] = [0;32]; //mantissa included
     let mut temp: u8 = 0; //get used for expoent and characteristic
     let mut i: usize = 0;
 
@@ -63,7 +63,7 @@ fn one_serialize(decimal: f32) {
             i -= 1;
         }
     }
-    println!("{:?}", ieee_array)
+    ieee_array
 }
 
 fn ieee754_to_decimal(binary: u32) -> f32 {
@@ -78,46 +78,38 @@ fn main() {
     let param2 = &args[2];
 
     loop {
-        let number_input: u32 = match param2.trim().parse() {
-            Ok(num) => num,
-            Err(_) => {
-                println!("Invalid input in loop");
-                continue;
-            }
-        };
         let option:Vec<_> = param1.chars().collect();
         match option[0] {
             's' => {
-                println!("Type you float number");
-                //Take userInput as a string
                 println!("<=Serialize=>");
-                println!("Type number in");
-                let mut user_input =  String::new();
-                io::stdin()
-                    .read_line(&mut user_input)
-                    .expect("Fail to read from stdin");
-                //Converting the input to float
-                let number: f32 = match user_input.trim().parse() {
-                    Ok(n) => n,
-                    Err(_) => {
-                        println!("Invalid input");
-                        return;
-                    }
-                };
-                one_serialize(number);
-                break;
+                if let Ok(user_number) = param2.parse::<f32>(){
+                    println!("Binary: {:?}",decimal_to_ieee754(user_number));
+                    break;
+                }
+                else {
+                    println!("Error: Invalid input in serialize function");
+                    break;
+                }   
             }
+            /*
             'd' => {
-                //Take userInput as a string
                 println!("<=Deserialize=>");
-                println!("Type you IEEE754 standartisted number");
+                if let Ok(user_number) = param2.parse::<u32>(){
+                    println!("Decimal: {}",ieee754_to_decimal(user_number));
+                    break;
+                }
+                else {
+                    println!("Error: Invalid input in serialize function");
+                    break;
+                }   
+
                 let binary_value: u32 = 0b1000001011100100000000000000000;
-                let decimal_value = ieee754_to_decimal(binary_value);
-                println!("IEEE 754 Binär: {:032b}", binary_value);
-                println!("Dezimal: {}", decimal_value);
+            }
+            */
+            _ => {
+                println!("Type: [execution] -s (serialize) || -d (desirialised) [value]");
                 break;
             }
-            _ => println!("Type: [execution] -s (serialize) || -d (desirialised) [value]")
         }
     }
 }
