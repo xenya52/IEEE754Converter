@@ -66,10 +66,19 @@ fn decimal_to_ieee754(decimal: f32) -> [u32;32] {
     ieee_array
 }
 
-fn ieee754_to_decimal(binary: u32) -> f32 {
-    // Reinterpretiere die binäre Darstellung als Gleitkommazahl
-    let float_value = unsafe { std::mem::transmute::<u32, f32>(binary) };
-    float_value
+fn ieee754_binary_to_float(binary: &str) -> Result<f32, &'static str> {
+    // Ensure the binary string has 32 bits
+    if binary.len() != 32 {
+        return Err("Binary representation must be 32 bits long");
+    }
+
+    // Parse the binary string as u32
+    let parsed_u32 = u32::from_str_radix(binary, 2).map_err(|_| "Invalid binary representation")?;
+
+    // Reinterpret the binary representation as a floating-point number
+    let float_value = f32::from_bits(parsed_u32);
+
+    Ok(float_value)
 }
 
 fn main() {
@@ -91,21 +100,18 @@ fn main() {
                     break;
                 }   
             }
-            /*
             'd' => {
                 println!("<=Deserialize=>");
-                if let Ok(user_number) = param2.parse::<u32>(){
-                    println!("Decimal: {}",ieee754_to_decimal(user_number));
-                    break;
+                let binary = "01000001011100100000000000000000";
+                match ieee754_binary_to_float(&param2) {
+                    Ok(result) => {
+                        println!("Deserialized value: {}", result);
+                    }
+                    Err(err) => {
+                        eprintln!("Error converting binary string to float: {}", err);
+                    }
                 }
-                else {
-                    println!("Error: Invalid input in serialize function");
-                    break;
-                }   
-
-                let binary_value: u32 = 0b1000001011100100000000000000000;
             }
-            */
             _ => {
                 println!("Type: [execution] -s (serialize) || -d (desirialised) [value]");
                 break;
