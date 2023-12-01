@@ -1,9 +1,10 @@
-use std::{io, env};
+use std::{env};
 
 /*
 From decimal to IEEE754
 */
-fn decimal_to_ieee754(decimal: f32) -> [u32;32] {
+fn decimal_to_ieee754(input: &String) ->Result <[u32;32], &'static str> {
+    let decimal:f32 = input.parse().expect("Please type right datatype for serialsation");
     let numeric_input = decimal;
     let mut pre_decimal_place: i32 = decimal as i32;
     let mut decimal_place: f32 = decimal - pre_decimal_place as f32;
@@ -63,7 +64,7 @@ fn decimal_to_ieee754(decimal: f32) -> [u32;32] {
             i -= 1;
         }
     }
-    ieee_array
+    Ok(ieee_array)
 }
 
 fn ieee754_binary_to_float(binary: &str) -> Result<f32, &'static str> {
@@ -91,26 +92,15 @@ fn main() {
         match option[0] {
             's' => {
                 println!("<=Serialize=>");
-                if let Ok(user_number) = param2.parse::<f32>(){
-                    println!("Binary: {:?}",decimal_to_ieee754(user_number));
-                    break;
-                }
-                else {
-                    println!("Error: Invalid input in serialize function");
-                    break;
-                }   
+                let solution = decimal_to_ieee754(&param2);
+                println!("Decimal: {:?}", solution);
+                break;
             }
             'd' => {
                 println!("<=Deserialize=>");
-                let binary = "01000001011100100000000000000000";
-                match ieee754_binary_to_float(&param2) {
-                    Ok(result) => {
-                        println!("Deserialized value: {}", result);
-                    }
-                    Err(err) => {
-                        eprintln!("Error converting binary string to float: {}", err);
-                    }
-                }
+                let solution = ieee754_binary_to_float(&param2);
+                println!("Float: {:?}", solution);
+                break;
             }
             _ => {
                 println!("Type: [execution] -s (serialize) || -d (desirialised) [value]");
